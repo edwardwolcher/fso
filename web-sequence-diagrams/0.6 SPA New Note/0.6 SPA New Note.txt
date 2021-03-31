@@ -1,0 +1,16 @@
+title 0.6 SPA New Note
+
+note over browser: 
+Form submits JSON formatted payload 
+{"content":"content submitted","date":"date submitted"}
+end note
+
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/notes
+
+note over server: 
+Server responds with 201 status message and no 
+additonal requests for redirects. 
+end note
+
+server-->browser: 201 created

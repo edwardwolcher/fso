@@ -1,0 +1,37 @@
+title 0.4 New Note
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note
+
+note over server: 
+Server responds with code 302, a URL redirect 
+which asks the browser to do a new HTTP Get
+end note
+
+server-->browser: Status Code 302, Location: /notes
+
+
+note over browser:
+Browser now reloads the page with the same
+series of requests that it performed initially.
+The below diagram is thus identical. 
+end note
+
+browser->server: HTTP GET fullstack-exampleapp.herokuapp.com
+server-->browser: Status 200, HTML-code
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+server-->browser: Status 200, main.css
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+server-->browser: Status 200, main.js
+
+note over browser:
+browser starts executing js-code
+that requests JSON data from server 
+end note
+
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+server-->browser: [{ content: "HTML is easy", date: "2019-05-23" }, ...]
+
+note over browser:
+browser executes the event handler
+that renders notes to display
+end note
