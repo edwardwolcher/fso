@@ -6,6 +6,15 @@ const Button = ({ name, handleClick }) => (
 
 const Statistics = ({ good, neutral, bad }) => {
   const all = good + bad + neutral;
+
+  if (all <= 0) {
+    return (
+      <>
+        <h2>Statistics</h2>
+        <p>No Feedback Given</p>
+      </>
+    );
+  }
   const average = (all / 3).toFixed(2);
   const positive = `${Math.floor((good / all) * 100)}%`;
   return (
