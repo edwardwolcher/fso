@@ -30,6 +30,9 @@ const App = () => {
       <p>Good: {good}</p>
       <p>Neutral: {neutral}</p>
       <p>Bad: {bad}</p>
+      <p>All: {good + bad + neutral}</p>
+      <p>Average: {((good + bad + neutral) / 3).toFixed(2)}</p>
+      <p>Positive: {Math.floor((good / (good + bad + neutral)) * 100)}%</p>
     </div>
   );
 };
