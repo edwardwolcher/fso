@@ -4,6 +4,23 @@ const Button = ({ name, handleClick }) => (
   <button onClick={handleClick}>{name}</button>
 );
 
+const Statistics = ({ good, neutral, bad }) => {
+  const all = good + bad + neutral;
+  const average = (all / 3).toFixed(2);
+  const positive = `${Math.floor((good / all) * 100)}%`;
+  return (
+    <>
+      <h2>Statistics</h2>
+      <p>Good: {good}</p>
+      <p>Neutral: {neutral}</p>
+      <p>Bad: {bad}</p>
+      <p>All: {all}</p>
+      <p>Average: {average}</p>
+      <p>Positive: {positive}</p>
+    </>
+  );
+};
+
 const App = () => {
   // save clicks of each button to its own state
   const [good, setGood] = useState(0);
@@ -26,13 +43,7 @@ const App = () => {
         />
         <Button name="bad" handleClick={() => incriment(bad, setBad)} />
       </div>
-      <h2>Statistics</h2>
-      <p>Good: {good}</p>
-      <p>Neutral: {neutral}</p>
-      <p>Bad: {bad}</p>
-      <p>All: {good + bad + neutral}</p>
-      <p>Average: {((good + bad + neutral) / 3).toFixed(2)}</p>
-      <p>Positive: {Math.floor((good / (good + bad + neutral)) * 100)}%</p>
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   );
 };
