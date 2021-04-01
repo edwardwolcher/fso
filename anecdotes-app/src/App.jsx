@@ -34,6 +34,9 @@ const data = [
 // Utility Functions
 const getRandomIndex = (array) => Math.floor(Math.random() * array.length);
 
+const getIndexofMost = (array) =>
+  array.reduce((iMax, element, i, arr) => (element > arr[iMax] ? i : iMax), 0);
+
 // Components
 const Button = ({ name, handleClick }) => (
   <button onClick={handleClick}>{name}</button>
@@ -70,12 +73,18 @@ const App = () => {
   return (
     <div>
       <h1>Anecdotes</h1>
+      <h2>Anecdote of the Day</h2>
       <Anecdote
         anecdote={anecdotes[selected].anecdote}
         votes={upVotes[selected]}
       />
       <Button name="next anecdote" handleClick={() => setRandomAnecdote()} />
       <Button name="👍" handleClick={() => upVoteAnecdote(selected)} />
+      <h2>Anecdote with the Most Votes</h2>
+      <Anecdote
+        anecdote={anecdotes[getIndexofMost(upVotes)].anecdote}
+        votes={upVotes[getIndexofMost(upVotes)]}
+      />
     </div>
   );
 };
