@@ -34,11 +34,17 @@ const Input = ({ value, setter }) => {
   return <input value={value} onChange={handleChange} />;
 };
 
-const NewPerson = ({ addPerson }) => {
+const NewPerson = ({ persons, addPerson }) => {
   const [newName, setNewName] = useState("");
 
   const submit = (e) => {
     e.preventDefault();
+
+    if (persons.find((person) => person.name === newName)) {
+      window.alert(`${newName} already exists in directory`);
+      return;
+    }
+
     const newPerson = {
       id: newId(),
       name: newName,
@@ -71,7 +77,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <NewPerson addPerson={addPerson} />
+      <NewPerson persons={persons} addPerson={addPerson} />
       <Directory persons={persons} />
     </div>
   );
