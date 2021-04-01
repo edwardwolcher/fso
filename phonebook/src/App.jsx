@@ -68,6 +68,17 @@ const NewPersonForm = ({
   );
 };
 
+const SearchField = ({ searchTerm, setSearchTerm }) => {
+  const searchFieldLabel = "Filter Directory with: ";
+  const searchFieldId = "input-searchfield";
+  return (
+    <div>
+      <label htmlFor={searchFieldId}>{searchFieldLabel}</label>
+      <Input value={searchTerm} setter={setSearchTerm} id={searchFieldId} />
+    </div>
+  );
+};
+
 const App = () => {
   const initialPersons = data;
   const [persons, setPersons] = useState(initialPersons);
@@ -100,7 +111,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <Input value={searchTerm} setter={setSearchTerm} />
+      <SearchField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <h2>Add Person</h2>
       <NewPersonForm
         newName={newName}
