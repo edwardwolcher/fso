@@ -1,40 +1,9 @@
 import React from "react";
 
-const Header = ({ course }) => <h1>{course}</h1>;
-
-const Part = ({ part }) => (
-  <p>
-    {part.name} {part.exercises}
-  </p>
-);
-
-const Content = ({ parts }) => (
-  <div>
-    {parts.map((part) => (
-      <Part key={part.id} part={part} />
-    ))}
-  </div>
-);
-
-const Total = ({ parts }) => (
-  <p>
-    Number of exercises:{" "}
-    {parts.reduce((total, part) => (total += part.exercises), 0)}
-  </p>
-);
-
-const Course = ({ course }) => (
-  <div>
-    <Header course={course.name} />
-    <Content parts={course.parts} />
-    <Total parts={course.parts} />
-  </div>
-);
-
-const App = () => {
-  const course = {
-    id: 1,
+const data = [
+  {
     name: "Half Stack application development",
+    id: 1,
     parts: [
       {
         name: "Fundamentals of React",
@@ -51,12 +20,69 @@ const App = () => {
         exercises: 14,
         id: 3,
       },
+      {
+        name: "Redux",
+        exercises: 11,
+        id: 4,
+      },
     ],
-  };
+  },
+  {
+    name: "Node.js",
+    id: 2,
+    parts: [
+      {
+        name: "Routing",
+        exercises: 3,
+        id: 1,
+      },
+      {
+        name: "Middlewares",
+        exercises: 7,
+        id: 2,
+      },
+    ],
+  },
+];
+
+const Header = ({ course }) => <h2>{course}</h2>;
+
+const Part = ({ part }) => (
+  <p>
+    {part.name} {part.exercises}
+  </p>
+);
+
+const Content = ({ parts }) => (
+  <div>
+    {parts.map((part) => (
+      <Part key={part.id} part={part} />
+    ))}
+  </div>
+);
+
+const Total = ({ parts }) => {
+  const total = parts.reduce((total, part) => (total += part.exercises), 0);
+  return <strong>Number of exercises: {total}</strong>;
+};
+
+const Course = ({ course }) => (
+  <div>
+    <Header course={course.name} />
+    <Content parts={course.parts} />
+    <Total parts={course.parts} />
+  </div>
+);
+
+const App = () => {
+  const courses = data;
 
   return (
     <div>
-      <Course course={course} />
+      <h1>Web Development Cirriculum</h1>
+      {courses.map((course) => (
+        <Course key={course.id} course={course} />
+      ))}
     </div>
   );
 };
