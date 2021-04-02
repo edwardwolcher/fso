@@ -94,10 +94,31 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-    if (persons.find((person) => person.name === newName)) {
-      alert(`${newName} already in directory`);
+    const overwritePerson = persons.find((person) => person.name === newName);
+    if (overwritePerson) {
+      if (overwritePerson.number === newNumber) {
+        alert(`${newName} already in directory`);
+        return;
+      }
+      if (window.confirm(`${newName} already in directory, update number?`)) {
+        const newPersonObject = { ...overwritePerson, number: newNumber };
+        directoryService
+          .update(newPersonObject.id, newPersonObject)
+          .then((response) => {
+            const newPersons = persons.filter((p) => p.id !== response.data.id);
+            newPersons.push(response.data);
+            setPersons(newPersons);
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((error) => {
+            alert("error updating database");
+          });
+        return;
+      }
       return;
     }
+
     const newPersonObject = {
       id: newId(),
       name: newName,
