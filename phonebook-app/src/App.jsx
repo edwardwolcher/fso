@@ -83,6 +83,7 @@ const App = () => {
         const response = await axios.get(dataUrl);
         setPersons(response.data);
       } catch (error) {
+        // TODO -- error handling
         console.log(error);
       }
     };
