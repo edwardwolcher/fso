@@ -1,18 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-// Initial Data
-const data = [
-  {
-    id: 1,
-    name: "Clive Cat",
-    number: "555-1212",
-  },
-  {
-    id: 2,
-    name: "Edward",
-    number: "555-2323",
-  },
-];
+// Data target
+const dataUrl = "http://localhost:3001/directory";
 
 // Utility Functions
 const newId = () => Math.floor(Math.random() * 100000);
@@ -69,7 +59,7 @@ const NewPersonForm = ({
 };
 
 const SearchField = ({ searchTerm, setSearchTerm }) => {
-  const searchFieldLabel = "Filter Directory with: ";
+  const searchFieldLabel = "Filter Directory: ";
   const searchFieldId = "input-searchfield";
   return (
     <div>
@@ -79,13 +69,21 @@ const SearchField = ({ searchTerm, setSearchTerm }) => {
   );
 };
 
+// App
 const App = () => {
-  const initialPersons = data;
-  const [persons, setPersons] = useState(initialPersons);
+  const [persons, setPersons] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get(dataUrl);
+      setPersons(response.data);
+    };
+    fetchData();
+  }, []);
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -111,7 +109,6 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <SearchField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <h2>Add Person</h2>
       <NewPersonForm
         newName={newName}
@@ -121,6 +118,7 @@ const App = () => {
         addPerson={addPerson}
       />
       <h2>Directory</h2>
+      <SearchField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <Directory personsDisplay={personsDisplay} />
     </div>
   );

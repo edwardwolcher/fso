@@ -1,0 +1,14 @@
+{
+  "directory": [
+    {
+      "id": 1,
+      "name": "Clive Cat",
+      "number": "555-1212"
+    },
+    {
+      "id": 2,
+      "name": "Edward",
+      "number": "555-2323"
+    }
+  ]
+}
