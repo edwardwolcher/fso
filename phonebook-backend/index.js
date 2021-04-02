@@ -1,8 +1,27 @@
 import express, { request, response } from "express";
+import morgan from "morgan";
+
+// Middleware Functions
+morgan.token("body", (req) => JSON.stringify(req.body));
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+// Utility Functions
+const generateId = () => {
+  if (directory.length === 0) return 1;
+  return Math.max(...directory.map((l) => l.id)) + 1;
+};
+
+// Initiate App and Bring in Middleware
 const app = express();
-
 app.use(express.json());
+app.use(
+  morgan(":method :url :status :res[content-length] :response-time ms :body")
+);
 
+// Initial Data
 let directory = [
   {
     id: 1,
@@ -21,14 +40,9 @@ let directory = [
   },
 ];
 
-// Utility Functions
-const generateId = () => {
-  if (directory.length === 0) return 1;
-  return Math.max(...directory.map((l) => l.id)) + 1;
-};
-
-// Get Info
+// Routes
 app.get("/api/info", (request, response) => {
+  // Get Info
   const date = new Date();
   const numberOfListings = directory.length;
   const text =
@@ -36,27 +50,27 @@ app.get("/api/info", (request, response) => {
   response.send(text);
 });
 
-// Get All
 app.get("/api/directory", (request, response) => {
+  // Get All
   response.json(directory);
 });
 
-// Get Specific Listing
 app.get("/api/directory/:id", (request, response) => {
+  // Get Specific Listing
   const id = Number(request.params.id);
   const listing = directory.find((listing) => listing.id === id);
   response.json(listing);
 });
 
-// Delete Specific Lisiting
 app.delete("/api/directory/:id", (request, response) => {
+  // Delete Specific Lisiting
   const id = Number(request.params.id);
   directory = directory.filter((listing) => listing.id !== id);
   response.status(204).end();
 });
 
-// Add Listing
 app.post("/api/directory", (request, response) => {
+  // Add Listing
   const listingObject = request.body;
 
   // Check if request has minimum content
@@ -72,12 +86,16 @@ app.post("/api/directory", (request, response) => {
       error: `'${listingObject.name}' already in directory. Names must be unique`,
     });
   }
-
+  // If everything is good create new Listing and push to database
   const newListing = { ...listingObject, id: generateId() };
   directory.push(newListing);
   response.json(newListing);
 });
 
+// Add post-route middleware:
+app.use(unknownEndpoint);
+
+// Start App
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
