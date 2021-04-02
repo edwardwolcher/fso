@@ -82,7 +82,11 @@ const App = () => {
       const response = await axios.get(dataUrl);
       setPersons(response.data);
     };
-    fetchData();
+    try {
+      fetchData();
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
 
   const addPerson = (event) => {
