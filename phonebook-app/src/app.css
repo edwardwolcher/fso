@@ -40,10 +40,9 @@ h1 {
 }
 
 .addPerson {
-  width: fit-content;
   padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 2px dotted lightslategray;
+  border-bottom: 2px dotted lightslategray;
+  border-top: 2px dotted lightslategray;
 }
 
 .newPersonForm > div,
