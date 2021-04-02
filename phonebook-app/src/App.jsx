@@ -79,14 +79,15 @@ const App = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get(dataUrl);
-      setPersons(response.data);
+      try {
+        const response = await axios.get(dataUrl);
+        setPersons(response.data);
+      } catch (error) {
+        console.log(error);
+      }
     };
-    try {
-      fetchData();
-    } catch (error) {
-      console.log(error);
-    }
+
+    fetchData();
   }, []);
 
   const addPerson = (event) => {
