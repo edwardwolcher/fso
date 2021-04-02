@@ -3,7 +3,7 @@ import directoryService from "./services/directory";
 import "./app.css";
 
 // Utility Functions
-const newId = () => Math.floor(Math.random() * 100000);
+// const newId = () => Math.floor(Math.random() * 100000);
 const formatElementId = (string) => string.replace(/[\W]/g, "").toLowerCase();
 
 // Components
@@ -141,7 +141,7 @@ const App = () => {
     }
 
     const newPersonObject = {
-      id: newId(),
+      // id: newId(),
       name: newName,
       number: newNumber,
     };
