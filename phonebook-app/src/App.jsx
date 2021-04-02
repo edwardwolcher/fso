@@ -1,39 +1,43 @@
 import React, { useState, useEffect } from "react";
 import directoryService from "./services/directory";
+import "./app.css";
 
 // Utility Functions
 const newId = () => Math.floor(Math.random() * 100000);
 const formatElementId = (string) => string.replace(/[\W]/g, "").toLowerCase();
 
 // Components
-const Listing = ({ person, removePerson }) => (
-  <li>
-    {person.name} ~ {person.number}{" "}
-    <button
-      onClick={() => {
-        removePerson(person);
-      }}
-    >
-      delete
-    </button>
-  </li>
-);
-
-const Directory = ({ personsDisplay, removePerson }) => {
-  return (
-    <ul>
-      {personsDisplay.map((person) => (
-        <Listing key={person.id} person={person} removePerson={removePerson} />
-      ))}
-    </ul>
-  );
-};
 
 const Input = ({ value, setter, type = "text", id = null }) => {
   const handleChange = (e) => {
     setter(e.target.value);
   };
   return <input type={type} id={id} value={value} onChange={handleChange} />;
+};
+
+const Listing = ({ person, removePerson }) => (
+  <tr>
+    <td> {person.name} </td> {person.number}
+    <td>
+      <button
+        onClick={() => {
+          removePerson(person);
+        }}
+      >
+        delete
+      </button>
+    </td>
+  </tr>
+);
+
+const Directory = ({ personsDisplay, removePerson }) => {
+  return (
+    <table>
+      {personsDisplay.map((person) => (
+        <Listing key={person.id} person={person} removePerson={removePerson} />
+      ))}
+    </table>
+  );
 };
 
 const NewPersonForm = ({
@@ -48,7 +52,7 @@ const NewPersonForm = ({
   const numberLabel = "Number: ";
   const numberId = "input-" + formatElementId(numberLabel);
   return (
-    <form onSubmit={addPerson}>
+    <form className="newPersonForm" onSubmit={addPerson}>
       <div>
         <label htmlFor={nameId}>{nameLabel}</label>
         <Input value={newName} setter={setNewName} id={nameId} />
@@ -62,11 +66,19 @@ const NewPersonForm = ({
   );
 };
 
+const MessageBox = ({ message }) => {
+  return (
+    <div className="message" data-state={message.type}>
+      {message.text}
+    </div>
+  );
+};
+
 const SearchField = ({ searchTerm, setSearchTerm }) => {
-  const searchFieldLabel = "Filter Directory: ";
+  const searchFieldLabel = "Filter:";
   const searchFieldId = "input-searchfield";
   return (
-    <div>
+    <div className="searchField">
       <label htmlFor={searchFieldId}>{searchFieldLabel}</label>
       <Input value={searchTerm} setter={setSearchTerm} id={searchFieldId} />
     </div>
@@ -77,9 +89,17 @@ const SearchField = ({ searchTerm, setSearchTerm }) => {
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+  const [message, setMessage] = useState(null);
+
+  const sendMessage = (text, type = "ok", duration = 5000) => {
+    const newMessage = { text, type };
+    setMessage(newMessage);
+    setTimeout(() => {
+      setMessage(null);
+    }, duration);
+  };
 
   useEffect(() => {
     directoryService
@@ -88,7 +108,7 @@ const App = () => {
         setPersons(response.data);
       })
       .catch((error) => {
-        alert("error communicating with server");
+        sendMessage("error communicating with server", "error");
       });
   }, []);
 
@@ -97,7 +117,7 @@ const App = () => {
     const overwritePerson = persons.find((person) => person.name === newName);
     if (overwritePerson) {
       if (overwritePerson.number === newNumber) {
-        alert(`${newName} already in directory`);
+        sendMessage(`${newName} already in directory`, "error");
         return;
       }
       if (window.confirm(`${newName} already in directory, update number?`)) {
@@ -110,9 +130,10 @@ const App = () => {
             setPersons(newPersons);
             setNewName("");
             setNewNumber("");
+            sendMessage(`${response.data.name} added to directory`);
           })
           .catch((error) => {
-            alert("error updating database");
+            sendMessage("error updating database", "error");
           });
         return;
       }
@@ -132,9 +153,10 @@ const App = () => {
         setPersons(newPersons);
         setNewName("");
         setNewNumber("");
+        sendMessage(`${response.data.name} added to directory`);
       })
       .catch((error) => {
-        alert("error adding person");
+        sendMessage("error adding person", "error");
       });
   };
 
@@ -155,19 +177,27 @@ const App = () => {
   );
 
   return (
-    <div>
+    <div className="app flow">
       <h1>Phonebook</h1>
-      <h2>Add Person</h2>
-      <NewPersonForm
-        newName={newName}
-        setNewName={setNewName}
-        newNumber={newNumber}
-        setNewNumber={setNewNumber}
-        addPerson={addPerson}
-      />
-      <h2>Directory</h2>
-      <SearchField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <Directory personsDisplay={personsDisplay} removePerson={removePerson} />
+      {message && <MessageBox message={message} />}
+      <div className="addPerson flow">
+        <h2>Add Person</h2>
+        <NewPersonForm
+          newName={newName}
+          setNewName={setNewName}
+          newNumber={newNumber}
+          setNewNumber={setNewNumber}
+          addPerson={addPerson}
+        />
+      </div>
+      <div className="directory flow">
+        <h2>Directory</h2>
+        <SearchField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <Directory
+          personsDisplay={personsDisplay}
+          removePerson={removePerson}
+        />
+      </div>
     </div>
   );
 };
