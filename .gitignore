@@ -3,3 +3,6 @@ _utils
 
 # Misc
 .DS_Store
+
+# Sensitive Data
+.env
