@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
-// Data target
-const dataUrl = "http://localhost:3001/directory";
+import directoryService from "./services/directory";
 
 // Utility Functions
 const newId = () => Math.floor(Math.random() * 100000);
 const formatElementId = (string) => string.replace(/[\W]/g, "").toLowerCase();
 
 // Components
-const Listing = ({ person }) => (
+const Listing = ({ person, removePerson }) => (
   <li>
-    {person.name} ~ {person.number}
+    {person.name} ~ {person.number}{" "}
+    <button
+      onClick={() => {
+        removePerson(person);
+      }}
+    >
+      delete
+    </button>
   </li>
 );
 
-const Directory = ({ personsDisplay }) => {
+const Directory = ({ personsDisplay, removePerson }) => {
   return (
     <ul>
       {personsDisplay.map((person) => (
-        <Listing key={person.id} person={person} />
+        <Listing key={person.id} person={person} removePerson={removePerson} />
       ))}
     </ul>
   );
@@ -78,33 +82,51 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(dataUrl);
+    directoryService
+      .getAll()
+      .then((response) => {
         setPersons(response.data);
-      } catch (error) {
-        // TODO -- error handling
-        console.log(error);
-      }
-    };
-    fetchData();
+      })
+      .catch((error) => {
+        alert("error communicating with server");
+      });
   }, []);
 
   const addPerson = (event) => {
     event.preventDefault();
     if (persons.find((person) => person.name === newName)) {
-      window.alert(`${newName} already in directory`);
+      alert(`${newName} already in directory`);
       return;
     }
-    const newPerson = {
+    const newPersonObject = {
       id: newId(),
       name: newName,
       number: newNumber,
     };
-    const newPersons = [...persons, newPerson];
-    setPersons(newPersons);
-    setNewName("");
-    setNewNumber("");
+
+    directoryService
+      .create(newPersonObject)
+      .then((response) => {
+        const newPersons = [...persons, response.data];
+        setPersons(newPersons);
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((error) => {
+        alert("error adding person");
+      });
+  };
+
+  const removePerson = (person) => {
+    directoryService
+      .remove(person.id)
+      .then((response) => {
+        const newPersons = persons.filter((p) => p.id !== person.id);
+        setPersons(newPersons);
+      })
+      .catch((error) => {
+        alert(`error deleting ${person.name}`);
+      });
   };
 
   const personsDisplay = persons.filter((person) =>
@@ -124,7 +146,7 @@ const App = () => {
       />
       <h2>Directory</h2>
       <SearchField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <Directory personsDisplay={personsDisplay} />
+      <Directory personsDisplay={personsDisplay} removePerson={removePerson} />
     </div>
   );
 };
