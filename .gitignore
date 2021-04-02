@@ -3,6 +3,7 @@ _utils
 
 # Misc
 .DS_Store
+node_modules
 
 # Sensitive Data
 .env

@@ -1,8 +1,11 @@
 import express, { request, response } from "express";
 import morgan from "morgan";
+import cors from "cors";
 
 // Middleware Functions
 morgan.token("body", (req) => JSON.stringify(req.body));
+const morganFormat =
+  ":method :url :status :res[content-length] :response-time ms :body";
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
@@ -17,9 +20,9 @@ const generateId = () => {
 // Initiate App and Bring in Middleware
 const app = express();
 app.use(express.json());
-app.use(
-  morgan(":method :url :status :res[content-length] :response-time ms :body")
-);
+app.use(morgan(morganFormat));
+app.use(cors());
+app.use(express.static("build"));
 
 // Initial Data
 let directory = [

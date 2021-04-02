@@ -17,7 +17,8 @@ const Input = ({ value, setter, type = "text", id = null }) => {
 
 const Listing = ({ person, removePerson }) => (
   <tr>
-    <td> {person.name} </td> {person.number}
+    <td>{person.name}</td>
+    <td>{person.number}</td>
     <td>
       <button
         onClick={() => {
@@ -33,9 +34,15 @@ const Listing = ({ person, removePerson }) => (
 const Directory = ({ personsDisplay, removePerson }) => {
   return (
     <table>
-      {personsDisplay.map((person) => (
-        <Listing key={person.id} person={person} removePerson={removePerson} />
-      ))}
+      <tbody>
+        {personsDisplay.map((person) => (
+          <Listing
+            key={person.id}
+            person={person}
+            removePerson={removePerson}
+          />
+        ))}
+      </tbody>
     </table>
   );
 };
