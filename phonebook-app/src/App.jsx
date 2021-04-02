@@ -87,7 +87,6 @@ const App = () => {
         console.log(error);
       }
     };
-
     fetchData();
   }, []);
 
