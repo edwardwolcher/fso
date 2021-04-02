@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-// data endpoint
-const dataUrl = "https://restcountries.eu/rest/v2/all";
+// data endpoints
+const countryDataUrl = "https://restcountries.eu/rest/v2/all";
+
+const weatherAPIKey = process.env.REACT_APP_API_KEY;
+const weatherDataUrl =
+  "http://api.weatherstack.com/current?access_key=" + weatherAPIKey + "&query=";
 
 // components
 
@@ -24,19 +28,45 @@ const SearchField = ({ searchTerm, setSearchTerm }) => {
   );
 };
 
-const CountryListItem = ({ country }) => <li>{country.name}</li>;
+const CountryListItem = ({ country, countrySelect }) => (
+  <li>
+    {country.name}{" "}
+    <button onClick={() => countrySelect(country)}>select</button>
+  </li>
+);
 
-const CountryList = ({ countries }) => {
+const CountryList = ({ countries, countrySelect }) => {
   return (
     <ul>
       {countries.map((country) => (
-        <CountryListItem key={country.alpha3Code} country={country} />
+        <CountryListItem
+          key={country.alpha3Code}
+          country={country}
+          countrySelect={countrySelect}
+        />
       ))}
     </ul>
   );
 };
 
 const CountryDisplay = ({ country }) => {
+  const [weatherData, setWeatherData] = useState(null);
+
+  // fetch weatherData
+  useEffect(() => {
+    const getWeatherData = async (country) => {
+      try {
+        const endpoint = weatherDataUrl + country.capital;
+        const response = await axios.get(endpoint);
+        setWeatherData(response.data);
+      } catch (error) {
+        // TODO -- error handling
+        console.log(error);
+      }
+    };
+    getWeatherData(country);
+  }, [country]);
+
   return (
     <div>
       <h2>{country.name}</h2>
@@ -49,6 +79,24 @@ const CountryDisplay = ({ country }) => {
         ))}
       </ul>
       <img width="150px" src={country.flag} alt="National Flag" />
+      <div>
+        {weatherData && (
+          <div>
+            <h3>Weather in {country.capital}</h3>
+            <p>
+              <b>Temperature:</b> {weatherData.current.temperature}°C
+            </p>
+            <img
+              src={weatherData.current.weather_icons[0]}
+              alt={weatherData.current.weather_descriptions[0]}
+            />
+            <p>
+              <b>wind:</b> {weatherData.current.wind_speed}mph{" "}
+              {weatherData.current.wind_dir}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -56,11 +104,13 @@ const CountryDisplay = ({ country }) => {
 const App = () => {
   const [countries, setCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [countryDisplay, setCountryDisplay] = useState(null);
 
+  // Populate countries array
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(dataUrl);
+        const response = await axios.get(countryDataUrl);
         setCountries(response.data);
       } catch (error) {
         // TODO -- error handling
@@ -70,23 +120,37 @@ const App = () => {
     fetchData();
   }, []);
 
-  const countriesToDisplay = countries.filter((country) =>
-    country.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Manage Country Display Setting on Search Term Change or Button Input
+  useEffect(() => {
+    const countriesToDisplay = countries.filter((country) =>
+      country.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const countrySelect = (selectedCountry) => {
+      const selection = countries.find(
+        (country) => country.alpha3Code === selectedCountry.alpha3Code
+      );
+      if (!selection) return;
+      setCountryDisplay(<CountryDisplay country={selection} />);
+    };
 
-  let countryDisplay;
-
-  if (searchTerm.length === 0) {
-    countryDisplay = <p>Enter search term above</p>;
-  } else if (countriesToDisplay.length <= 0) {
-    countryDisplay = <p>No countries match query</p>;
-  } else if (countriesToDisplay.length === 1) {
-    countryDisplay = <CountryDisplay country={countriesToDisplay[0]} />;
-  } else if (countriesToDisplay.length <= 10) {
-    countryDisplay = <CountryList countries={countriesToDisplay} />;
-  } else {
-    countryDisplay = <p>Too many results</p>;
-  }
+    if (searchTerm.length === 0) {
+      setCountryDisplay(<p>Enter search term above</p>);
+    } else if (countriesToDisplay.length <= 0) {
+      setCountryDisplay(<p>No countries match query</p>);
+    } else if (countriesToDisplay.length === 1) {
+      const newCountry = countriesToDisplay[0];
+      setCountryDisplay(<CountryDisplay country={newCountry} />);
+    } else if (countriesToDisplay.length <= 10) {
+      setCountryDisplay(
+        <CountryList
+          countries={countriesToDisplay}
+          countrySelect={countrySelect}
+        />
+      );
+    } else {
+      setCountryDisplay(<p>Too many results</p>);
+    }
+  }, [searchTerm, countries]);
 
   return (
     <div>
