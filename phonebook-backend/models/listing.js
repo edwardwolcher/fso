@@ -22,8 +22,16 @@ mongoose
   });
 
 const listingSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minlength: 1,
+    required: true,
+  },
+  number: {
+    type: String,
+    minlength: 1,
+    required: true,
+  },
 });
 
 listingSchema.set("toJSON", {

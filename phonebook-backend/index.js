@@ -18,6 +18,8 @@ const errorHandler = (error, req, res, next) => {
   switch (error.name) {
     case "CastError":
       return res.status(400).send({ error: "malformatted id" });
+    case "ValidationError":
+      return res.status(400).json({ error: error.message });
   }
   next(error);
 };
@@ -83,13 +85,7 @@ app.delete("/api/directory/:id", async (req, res, next) => {
 // Add Listing
 app.post("/api/directory", async (req, res, next) => {
   const body = req.body;
-  // Check if request has minimum content
-  if (!body.name || !body.number) {
-    return res.status(400).json({
-      error: "content missing",
-    });
-  }
-  // If everything is good create new Listing and push to database
+
   try {
     const listing = await new Listing({
       name: body.name,
