@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import mongoose from "mongoose";
+import uniqueValidator from "mongoose-unique-validator";
 
 const url = process.env.MONGODB_URI;
 
@@ -24,15 +25,18 @@ mongoose
 const listingSchema = new mongoose.Schema({
   name: {
     type: String,
-    minlength: 1,
+    minlength: 3,
     required: true,
+    unique: true,
   },
   number: {
     type: String,
-    minlength: 1,
+    minlength: 8,
     required: true,
   },
 });
+
+listingSchema.plugin(uniqueValidator);
 
 listingSchema.set("toJSON", {
   transform: (document, returnedObject) => {
