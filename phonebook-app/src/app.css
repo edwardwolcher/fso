@@ -67,8 +67,8 @@ h1 {
 .message {
   z-index: 99;
   position: absolute;
-  top: -0.5rem;
-  left: 1rem;
+  bottom: 0;
+  left: 0;
   font-family: Arial, Helvetica, sans-serif;
   opacity: 0.9;
   font-weight: 600;

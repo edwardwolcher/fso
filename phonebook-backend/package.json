@@ -9,8 +9,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "setconfig": "URI=$(grep MONGODB_URI .env | xargs) && heroku config:set ${URI}",
     "deploy": "heroku git:remote -a ew-fso-phonebook && cd ../ && git subtree push --prefix phonebook-backend heroku main",
-    "deploy:full": "sh setconfig.sh && npm run build:ui && cd ../ && git add phonebook-backend && git commit -m uibuild && git push && cd phonebook-backend && npm run deploy"
+    "deploy:full": "npm run setconfig && npm run build:ui && cd ../ && git add phonebook-backend && git commit -m uibuild && git push && cd phonebook-backend && npm run deploy"
   },
   "author": "Edward Wolcher",
   "license": "MIT",

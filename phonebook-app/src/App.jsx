@@ -36,24 +36,14 @@ const Directory = ({ personsDisplay, removePerson }) => {
     <table>
       <tbody>
         {personsDisplay.map((person) => (
-          <Listing
-            key={person.id}
-            person={person}
-            removePerson={removePerson}
-          />
+          <Listing key={person.id} person={person} removePerson={removePerson} />
         ))}
       </tbody>
     </table>
   );
 };
 
-const NewPersonForm = ({
-  newName,
-  setNewName,
-  newNumber,
-  setNewNumber,
-  addPerson,
-}) => {
+const NewPersonForm = ({ newName, setNewName, newNumber, setNewNumber, addPerson }) => {
   const nameLabel = "Name: ";
   const nameId = "input-" + formatElementId(nameLabel);
   const numberLabel = "Number: ";
@@ -163,7 +153,7 @@ const App = () => {
         sendMessage(`${response.data.name} added to directory`);
       })
       .catch((error) => {
-        sendMessage("error adding person", "error");
+        sendMessage(error.response.data.error, "error", 10000);
       });
   };
 
@@ -173,6 +163,7 @@ const App = () => {
       .then((response) => {
         const newPersons = persons.filter((p) => p.id !== person.id);
         setPersons(newPersons);
+        sendMessage(`${person.name} removed from directory`);
       })
       .catch((error) => {
         alert(`error deleting ${person.name}`);
@@ -200,10 +191,7 @@ const App = () => {
       <div className="directory flow">
         <h2>Directory</h2>
         <SearchField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        <Directory
-          personsDisplay={personsDisplay}
-          removePerson={removePerson}
-        />
+        <Directory personsDisplay={personsDisplay} removePerson={removePerson} />
       </div>
     </div>
   );
