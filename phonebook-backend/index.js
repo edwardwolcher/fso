@@ -85,7 +85,7 @@ app.post("/api/directory", async (req, res, next) => {
   const body = req.body;
   // Check if request has minimum content
   if (!body.name || !body.number) {
-    return response.status(400).json({
+    return res.status(400).json({
       error: "content missing",
     });
   }
@@ -96,6 +96,22 @@ app.post("/api/directory", async (req, res, next) => {
       number: body.number,
     }).save();
     res.json(listing);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Update Listing
+app.put("/api/directory/:id", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    const listing = {
+      name: body.name,
+      number: body.number,
+    };
+    const updatedNote = await Listing.findByIdAndUpdate(id, listing, { new: true });
+    res.json(updatedNote);
   } catch (err) {
     next(err);
   }
