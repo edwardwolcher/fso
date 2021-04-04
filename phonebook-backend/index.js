@@ -7,7 +7,8 @@ import Listing from "./models/listing.js";
 
 // Middleware Functions
 morgan.token("body", (req) => JSON.stringify(req.body));
-const morganFormat = ":method :url :status :res[content-length] :response-time ms :body";
+const morganFormat =
+  ":method :url :status :res[content-length] :response-time ms :body";
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
@@ -39,7 +40,8 @@ app.get("/api/info", async (req, res, next) => {
     const directory = await Listing.find({});
     const date = new Date();
     const numberOfListings = directory.length;
-    const text = `<p>Directory has ${numberOfListings} listings</p>` + `<p>${date}</p>`;
+    const text =
+      `<p>Directory has ${numberOfListings} listings</p>` + `<p>${date}</p>`;
     res.send(text);
   } catch (err) {
     next(err);
@@ -106,7 +108,9 @@ app.put("/api/directory/:id", async (req, res, next) => {
       name: body.name,
       number: body.number,
     };
-    const updatedNote = await Listing.findByIdAndUpdate(id, listing, { new: true });
+    const updatedNote = await Listing.findByIdAndUpdate(id, listing, {
+      new: true,
+    });
     res.json(updatedNote);
   } catch (err) {
     next(err);

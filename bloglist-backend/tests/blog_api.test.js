@@ -95,18 +95,45 @@ describe("Post", () => {
 });
 
 describe("Delete by ID", () => {
-  // test("a post can be deleted", () => {
-  //   const blogs = await getBlogs();
-  //   const oneBlog = blogs[0];
-  //   await api.delete(`api/blogs/${oneBlog.id}`).expect(204)
+  test("a post can be deleted", async () => {
+    const blogs = await getBlogs();
+    const oneBlog = blogs[0];
+    await api.delete(`/api/blogs/${oneBlog.id}`).expect(204);
+    const newBlogs = await getBlogs();
+    expect(newBlogs.length).toBe(blogs.length - 1);
+    const nullResult = await Blog.findById(oneBlog.id);
+    expect(nullResult).toBeNull();
+  });
 
-  // })
   test("retrieving a bad id gives a 404", async () => {
     const badID = await nonExistingId();
     await api.delete(`/api/blogs/${badID}`).expect(404);
   });
+
   test("malformed id gives a 400", async () => {
     await api.delete(`/api/blogs/foo`).expect(400);
+  });
+});
+
+describe("Update", () => {
+  test("a post can be updated", async () => {
+    const blogs = await getBlogs();
+    const oneBlog = blogs[0];
+    await api
+      .put(`/api/blogs/${oneBlog.id}`)
+      .send({ likes: oneBlog.likes + 1 })
+      .expect(200);
+    const updatedBlog = await Blog.findById(oneBlog.id);
+    expect(updatedBlog.likes).toBe(oneBlog.likes + 1);
+  });
+
+  test("putting to a bad id gives a 404", async () => {
+    const badID = await nonExistingId();
+    await api.put(`/api/blogs/${badID}`).send({ likes: 666 }).expect(404);
+  });
+
+  test("malformed id gives a 400", async () => {
+    await api.put(`/api/blogs/bar`).send({ likes: 666 }).expect(400);
   });
 });
 
