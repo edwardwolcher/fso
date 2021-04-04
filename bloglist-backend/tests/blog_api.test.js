@@ -105,7 +105,7 @@ describe("Delete by ID", () => {
     expect(nullResult).toBeNull();
   });
 
-  test("retrieving a bad id gives a 404", async () => {
+  test("deleting a bad id gives a 404", async () => {
     const badID = await nonExistingId();
     await api.delete(`/api/blogs/${badID}`).expect(404);
   });
