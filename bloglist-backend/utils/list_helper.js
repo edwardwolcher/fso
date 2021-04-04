@@ -29,6 +29,7 @@ const mostBlogs = (blogs) => {
     { posts: -1 }
   );
 };
+
 const mostLikes = (blogs) => {
   if (blogs.length === 0) return null;
   const authors = blogs.map((blog) => {

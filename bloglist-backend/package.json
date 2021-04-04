@@ -5,8 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon index.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --verbose"
+    "start": "NODE_ENV=production node index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
+    "setconfig": "URI=$(grep MONGODB_URI .env | xargs) && heroku config:set ${URI}",
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --verbose --runInBand"
   },
   "author": "",
   "license": "ISC",
