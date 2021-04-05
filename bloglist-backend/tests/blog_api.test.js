@@ -2,15 +2,25 @@ import mongoose from "mongoose";
 import supertest from "supertest";
 import app from "../app.js";
 import Blog from "../models/Blog.js";
-import { initialBlogs, getBlogs, nonExistingId } from "./test_helper";
+import User from "../models/User.js";
+import {
+  initialBlogs,
+  getBlogs,
+  nonExistingId,
+  initialAuthors,
+} from "./test_helper";
 
 const api = supertest(app);
 
 beforeAll(async () => {
   await Blog.deleteMany({});
+  await User.deleteMany({});
+  const userObjects = initialAuthors.map((user) => new User(user));
+  const userPromiseArray = userObjects.map((user) => user.save());
+  await Promise.all(userPromiseArray);
   const blogObjects = initialBlogs.map((blog) => new Blog(blog));
-  const promiseArray = blogObjects.map((blog) => blog.save());
-  await Promise.all(promiseArray);
+  const blogPromiseArray = blogObjects.map((blog) => blog.save());
+  await Promise.all(blogPromiseArray);
 });
 
 describe("Get All", () => {
@@ -32,7 +42,7 @@ describe("Get by ID", () => {
     const blogs = await getBlogs();
     const oneBlog = blogs[0];
     const result = await api.get(`/api/blogs/${oneBlog.id}`);
-    expect(result.body).toEqual(oneBlog);
+    expect(result.body.id).toEqual(oneBlog.id);
   });
 
   test("retrieving a bad id gives a 404", async () => {
@@ -49,7 +59,7 @@ describe("Post", () => {
   test("a new blog can be posted", async () => {
     const newBlog = {
       title: "newBlog",
-      author: "edward",
+      authorID: "5a422aa71b54a676234d17a1",
       url: "/blog/newBlog",
       likes: 5,
     };
@@ -67,7 +77,7 @@ describe("Post", () => {
   test("a new blog defaults to zero likes", async () => {
     const newBlog = {
       title: "unlikedBlog",
-      author: "edward",
+      authorID: "5a422aa71b54a676234d17a1",
       url: "/blog/unlikedBlog",
     };
     await api.post("/api/blogs").send(newBlog);
@@ -78,7 +88,7 @@ describe("Post", () => {
 
   test("new blog without 'title' gives 400", async () => {
     const newBlog = {
-      author: "edward",
+      author: "5a422aa71b54a676234d17a1",
       url: "/blog/newBlog",
       likes: 5,
     };
@@ -87,7 +97,7 @@ describe("Post", () => {
   test("new blog without 'url' gives 400", async () => {
     const newBlog = {
       title: "no url",
-      author: "edward",
+      author: "5a422aa71b54a676234d17a1",
       likes: 5,
     };
     await api.post("/api/blogs").expect(400);

@@ -1,18 +1,25 @@
 import express from "express";
 import Blog from "../models/Blog.js";
 import "express-async-errors";
+import User from "../models/User.js";
 const blogRouter = express.Router();
 
 // Get All
 blogRouter.get("/", async (req, res) => {
-  const blogs = await Blog.find({});
+  const blogs = await Blog.find({}).populate("author", {
+    username: 1,
+    name: 1,
+  });
   res.json(blogs);
 });
 
 // Get by Id
 blogRouter.get("/:id", async (req, res) => {
   const id = req.params.id;
-  const blog = await Blog.findById(id);
+  const blog = await Blog.findById(id).populate("author", {
+    username: 1,
+    name: 1,
+  });
   if (blog) {
     res.json(blog);
   } else {
@@ -22,8 +29,23 @@ blogRouter.get("/:id", async (req, res) => {
 
 // Post
 blogRouter.post("/", async (req, res) => {
-  const blog = new Blog(req.body);
+  const body = req.body;
+  const user = await User.findById(body.authorID);
+  if (!user) {
+    return res.status(400).send({ error: "author not found" });
+  }
+  if (!user.canAuthor()) {
+    console.log(user.role in ["author", "editor", "admin"]);
+    return res
+      .status(400)
+      .send({ error: "user does not have posting privileges" });
+  }
+  delete body.authorID;
+  const blogObject = { ...body, author: user._id };
+  const blog = new Blog(blogObject);
   const savedBlog = await blog.save();
+  user.blogs = user.blogs.concat(savedBlog._id);
+  await user.save();
   res.status(201).json(savedBlog);
 });
 

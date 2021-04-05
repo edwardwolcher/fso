@@ -1,8 +1,13 @@
 import express from "express";
 import connectDB from "./utils/connectDB.js";
 import cors from "cors";
-import { requestLogger, unknownEndpoint, errorHandler } from "./utils/middleware.js";
+import {
+  requestLogger,
+  unknownEndpoint,
+  errorHandler,
+} from "./utils/middleware.js";
 import blogRouter from "./controllers/blogs.js";
+import usersRouter from "./controllers/users.js";
 
 const app = express();
 
@@ -15,8 +20,9 @@ app.use(express.static("build"));
 app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
-// Main route
+// Main routes
 app.use("/api/blogs", blogRouter);
+app.use("/api/users", usersRouter);
 // Post-route middleware
 app.use(unknownEndpoint);
 app.use(errorHandler);
