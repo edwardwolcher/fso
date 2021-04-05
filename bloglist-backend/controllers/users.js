@@ -6,7 +6,7 @@ const usersRouter = express.Router();
 
 usersRouter.post("/", async (req, res) => {
   const body = req.body;
-  if (body.password.length < 4) {
+  if (!body.password || body.password.length < 4) {
     return res
       .status(400)
       .send({ error: "password must be at least 4 characters long" });

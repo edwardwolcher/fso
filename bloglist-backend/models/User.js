@@ -35,6 +35,11 @@ userSchema.methods.canAuthor = function () {
   if (this.role === "admin") return true;
   return false;
 };
+userSchema.methods.canEdit = function () {
+  if (this.role === "editor") return true;
+  if (this.role === "admin") return true;
+  return false;
+};
 
 const User = mongoose.model("User", userSchema);
 

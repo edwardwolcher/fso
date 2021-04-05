@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import Blog from "../models/Blog";
 import User from "../models/User";
 
@@ -44,7 +44,7 @@ const initialAuthors = [
     _id: "5a422aa71b54a676234d17a2",
     username: "clive",
     name: "Clive Cat",
-    role: "author",
+    role: "user",
     passwordHash:
       "$2b$10$utWgXh9X2BSxT6YFWWijYeKWXshv6XC71EKPRvs1lZyE0FzApLmCu",
     blogs: [],
@@ -75,4 +75,22 @@ const getUsers = async () => {
   return users.map((user) => user.toJSON());
 };
 
-export { initialBlogs, initialAuthors, getBlogs, nonExistingId, getUsers };
+const getToken = (user) => {
+  const userForToken = {
+    username: user.username,
+    id: user._id,
+  };
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60 * 60,
+  });
+  return token;
+};
+
+export {
+  initialBlogs,
+  initialAuthors,
+  getBlogs,
+  nonExistingId,
+  getUsers,
+  getToken,
+};

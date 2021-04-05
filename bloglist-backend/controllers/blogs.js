@@ -2,7 +2,9 @@ import express from "express";
 import Blog from "../models/Blog.js";
 import "express-async-errors";
 import User from "../models/User.js";
+import jwt from "jsonwebtoken";
 const blogRouter = express.Router();
+import { getUser } from "../utils/middleware.js";
 
 // Get All
 blogRouter.get("/", async (req, res) => {
@@ -28,18 +30,16 @@ blogRouter.get("/:id", async (req, res) => {
 });
 
 // Post
-blogRouter.post("/", async (req, res) => {
+blogRouter.post("/", getUser, async (req, res) => {
   const body = req.body;
-  const user = await User.findById(body.authorID);
-  if (!user) {
-    return res.status(400).send({ error: "author not found" });
-  }
+  const user = req.user;
+
   if (!user.canAuthor()) {
-    console.log(user.role in ["author", "editor", "admin"]);
     return res
-      .status(400)
+      .status(401)
       .send({ error: "user does not have posting privileges" });
   }
+
   delete body.authorID;
   const blogObject = { ...body, author: user._id };
   const blog = new Blog(blogObject);
@@ -50,10 +50,16 @@ blogRouter.post("/", async (req, res) => {
 });
 
 // Delete by ID
-blogRouter.delete("/:id", async (req, res) => {
+blogRouter.delete("/:id", getUser, async (req, res) => {
+  const user = req.user;
   const id = req.params.id;
-  const blog = await Blog.findByIdAndDelete(id);
-  if (blog) {
+  const blog = await Blog.findById(id);
+  if (!blog) return res.status(404).send({ error: "already deleted" });
+  if (!(blog.author.toString() === user._id.toString() || user.canEdit())) {
+    return res.status(401).send({ error: "insufficent prvileges" });
+  }
+  const deletedBlog = await Blog.findByIdAndDelete(id);
+  if (deletedBlog) {
     res.status(204).end();
   } else {
     res.status(404).end();

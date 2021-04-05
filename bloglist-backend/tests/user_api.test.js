@@ -46,6 +46,26 @@ describe("creating users", () => {
     expect(usersAtStart).toEqual(usersAtEnd);
   });
 
+  test("rejects missing username", async () => {
+    const usersAtStart = await getUsers();
+    const newUser = {
+      password: "12345",
+    };
+    await api.post("/api/users").send(newUser).expect(400);
+    const usersAtEnd = await getUsers();
+    expect(usersAtStart).toEqual(usersAtEnd);
+  });
+
+  test("rejects missing password", async () => {
+    const usersAtStart = await getUsers();
+    const newUser = {
+      username: "nopassword",
+    };
+    await api.post("/api/users").send(newUser).expect(400);
+    const usersAtEnd = await getUsers();
+    expect(usersAtStart).toEqual(usersAtEnd);
+  });
+
   test("rejects too short username", async () => {
     const usersAtStart = await getUsers();
     const newUser = {

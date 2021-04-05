@@ -8,6 +8,7 @@ import {
   getBlogs,
   nonExistingId,
   initialAuthors,
+  getToken,
 } from "./test_helper";
 
 const api = supertest(app);
@@ -63,8 +64,10 @@ describe("Post", () => {
       url: "/blog/newBlog",
       likes: 5,
     };
+    const token = getToken(initialAuthors[0]);
     await api
       .post("/api/blogs")
+      .set({ authorization: `Bearer ${token}` })
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -74,15 +77,33 @@ describe("Post", () => {
     expect(titles).toContain("newBlog");
   });
 
+  test("user without author+ role cannot post", async () => {
+    const newBlog = {
+      title: "newBlog",
+      authorID: "5a422aa71b54a676234d17a2",
+      url: "/blog/newBlog",
+      likes: 5,
+    };
+    const token = getToken(initialAuthors[1]);
+    await api
+      .post("/api/blogs")
+      .set({ authorization: `Bearer ${token}` })
+      .send(newBlog)
+      .expect(401);
+  });
+
   test("a new blog defaults to zero likes", async () => {
     const newBlog = {
       title: "unlikedBlog",
       authorID: "5a422aa71b54a676234d17a1",
       url: "/blog/unlikedBlog",
     };
-    await api.post("/api/blogs").send(newBlog);
-    const searchResult = await Blog.find({ title: "unlikedBlog" });
-    const createdBlog = searchResult[0].toJSON();
+    const token = getToken(initialAuthors[0]);
+    await api
+      .post("/api/blogs")
+      .set({ authorization: `Bearer ${token}` })
+      .send(newBlog);
+    const createdBlog = await Blog.findOne({ title: "unlikedBlog" });
     expect(createdBlog.likes).toBe(0);
   });
 
@@ -92,15 +113,24 @@ describe("Post", () => {
       url: "/blog/newBlog",
       likes: 5,
     };
-    await api.post("/api/blogs").expect(400);
+    const token = getToken(initialAuthors[0]);
+    await api
+      .post("/api/blogs")
+      .set({ authorization: `Bearer ${token}` })
+      .expect(400);
   });
+
   test("new blog without 'url' gives 400", async () => {
     const newBlog = {
       title: "no url",
       author: "5a422aa71b54a676234d17a1",
       likes: 5,
     };
-    await api.post("/api/blogs").expect(400);
+    const token = getToken(initialAuthors[0]);
+    await api
+      .post("/api/blogs")
+      .set({ authorization: `Bearer ${token}` })
+      .expect(400);
   });
 });
 
@@ -108,7 +138,11 @@ describe("Delete by ID", () => {
   test("a post can be deleted", async () => {
     const blogs = await getBlogs();
     const oneBlog = blogs[0];
-    await api.delete(`/api/blogs/${oneBlog.id}`).expect(204);
+    const token = getToken(initialAuthors[0]);
+    await api
+      .delete(`/api/blogs/${oneBlog.id}`)
+      .set({ authorization: `Bearer ${token}` })
+      .expect(204);
     const newBlogs = await getBlogs();
     expect(newBlogs.length).toBe(blogs.length - 1);
     const nullResult = await Blog.findById(oneBlog.id);
@@ -117,11 +151,19 @@ describe("Delete by ID", () => {
 
   test("deleting a bad id gives a 404", async () => {
     const badID = await nonExistingId();
-    await api.delete(`/api/blogs/${badID}`).expect(404);
+    const token = getToken(initialAuthors[0]);
+    await api
+      .delete(`/api/blogs/${badID}`)
+      .set({ authorization: `Bearer ${token}` })
+      .expect(404);
   });
 
   test("malformed id gives a 400", async () => {
-    await api.delete(`/api/blogs/foo`).expect(400);
+    const token = getToken(initialAuthors[0]);
+    await api
+      .delete(`/api/blogs/foo`)
+      .set({ authorization: `Bearer ${token}` })
+      .expect(400);
   });
 });
 
