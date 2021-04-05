@@ -1,67 +1,96 @@
 import React, { useState, useEffect } from "react";
 import Blog from "./components/Blog";
+import MessageBox from "./components/MessageBox";
+import NewBlogForm from "./components/NewBlogForm";
 import blogService from "./services/blogs";
-import loginService from "./services/login";
 import LoginForm from "./components/LoginForm";
+import "./app.css";
+
+// UTILITY FUNCTION (maybe move somewhere else)
+const canPost = (user) => {
+  if (!user) return false;
+  switch (user.role) {
+    case "author":
+      return true;
+    case "editor":
+      return true;
+    case "admin":
+      return true;
+    default:
+      return false;
+  }
+};
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+  const [message, setMessage] = useState(null);
+
+  const sendMessage = (text, type = "ok", duration = 5000) => {
+    const newMessage = { text, type };
+    setMessage(newMessage);
+    setTimeout(() => {
+      setMessage(null);
+    }, duration);
+  };
 
   useEffect(() => {
     const getBlogs = async () => {
       const response = await blogService.getAll();
       setBlogs(response);
     };
-    const getUser = () => {
-      const savedUser = window.localStorage.getItem("userInfo");
-      if (!savedUser) return;
-      setUser(savedUser);
-    };
-    getUser();
     getBlogs();
   }, []);
 
-  const login = async (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    const savedUserJSON = window.localStorage.getItem("userInfo");
+    if (savedUserJSON) {
+      const savedUser = JSON.parse(savedUserJSON);
+      setUser(savedUser);
+      blogService.setToken(savedUser.token);
+    }
+  }, []);
+
+  const deleteBlog = async (id) => {
     try {
-      const newUser = await loginService.login(username, password);
-      window.localStorage.setItem("userInfo", JSON.stringify(newUser));
-      blogService.setToken(newUser.token);
-      setUser(newUser);
-      setUsername("");
-      setPassword("");
+      await blogService.remove(id);
+      const indexToRemove = blogs.findIndex((blog) => blog.id === id);
+      const deletedBlogTitle = blogs[indexToRemove].title;
+      const newBlogs = [...blogs];
+      newBlogs.splice(indexToRemove, 1);
+      setBlogs(newBlogs);
+      sendMessage(`${deletedBlogTitle} removed`);
     } catch (error) {
-      //TODO - error handling
-      console.log(error);
+      sendMessage("error deleting blog", "error");
     }
   };
 
-  const logout = async () => {
-    window.localStorage.removeItem("userInfo");
-    blogService.setToken(null);
-    setUser(null);
-  };
-
   return (
-    <div>
-      <h2>blogs</h2>
-
-      <LoginForm
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
-        login={login}
-        logout={logout}
-        user={user}
-      />
-
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+    <div className="app">
+      <header>
+        <h1>Blog</h1>
+        <LoginForm user={user} setUser={setUser} sendMessage={sendMessage} />
+      </header>
+      {message && <MessageBox message={message} />}
+      <div className="wrapper">
+        {canPost(user) && (
+          <NewBlogForm
+            blogs={blogs}
+            setBlogs={setBlogs}
+            sendMessage={sendMessage}
+          />
+        )}
+        <div className="bloglist">
+          {blogs.map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              deleteBlog={deleteBlog}
+              user={user}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
