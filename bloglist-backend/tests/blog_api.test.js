@@ -149,6 +149,25 @@ describe("Delete by ID", () => {
     expect(nullResult).toBeNull();
   });
 
+  test("deleting with malformed token rejected", async () => {
+    const blogs = await getBlogs();
+    const oneBlog = blogs[0];
+    const token = "badtoken";
+    await api
+      .delete(`/api/blogs/${oneBlog.id}`)
+      .set({ authorization: `Bearer ${token}` })
+      .expect(401);
+  });
+  test("deleting without privileges rejected", async () => {
+    const blogs = await getBlogs();
+    const oneBlog = blogs[0];
+    const token = getToken(initialAuthors[1]);
+    await api
+      .delete(`/api/blogs/${oneBlog.id}`)
+      .set({ authorization: `Bearer ${token}` })
+      .expect(401);
+  });
+
   test("deleting a bad id gives a 404", async () => {
     const badID = await nonExistingId();
     const token = getToken(initialAuthors[0]);
