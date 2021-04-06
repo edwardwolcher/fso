@@ -18,18 +18,14 @@ const canDelete = (user, blog) => {
   }
 };
 
-const BlogDetails = ({ blog, user, deleteBlog, likeBlog }) => {
+const BlogDetails = ({ blog, user, deleteBlog }) => {
   const deletable = canDelete(user, blog);
-  const likeable = user ? true : false;
 
   return (
     <div>
       <div>
         <p>{blog.url}</p>
-        <div>
-          {likeable && <button onClick={() => likeBlog(blog.id)}>♡</button>}{" "}
-          {blog.likes}
-        </div>
+
         <p>{blog.author.name}</p>
         {deletable && (
           <button onClick={() => deleteBlog(blog.id)}>delete</button>
@@ -40,7 +36,10 @@ const BlogDetails = ({ blog, user, deleteBlog, likeBlog }) => {
 };
 
 const Blog = ({ blog, blogs, setBlogs, sendMessage, user }) => {
+  const likeable = user ? true : false;
+
   const deleteBlog = async (id) => {
+    if (!window.confirm(`Remove ${blog.title} by ${blog.author.name}?`)) return;
     try {
       await blogService.remove(id);
       const indexToRemove = blogs.findIndex((blog) => blog.id === id);
@@ -60,13 +59,13 @@ const Blog = ({ blog, blogs, setBlogs, sendMessage, user }) => {
         ...blog,
         likes: blog.likes + 1,
       };
-      console.log(likedBlog);
       const updatedBlog = await blogService.update(id, likedBlog);
       const indexToUpdate = blogs.findIndex(
         (blog) => blog.id === updatedBlog.id
       );
       const newBlogs = [...blogs];
       newBlogs[indexToUpdate] = updatedBlog;
+      newBlogs.sort((a, b) => b.likes - a.likes);
       setBlogs(newBlogs);
     } catch (error) {
       sendMessage("error liking blog", "error");
@@ -75,7 +74,17 @@ const Blog = ({ blog, blogs, setBlogs, sendMessage, user }) => {
 
   return (
     <div className="blogitem">
-      <h3>{blog.title}</h3>
+      <div className="blogHeader">
+        <h3>{blog.title}</h3>
+        <div className="blogLikeField">
+          {likeable && (
+            <button className="likeButton" onClick={() => likeBlog(blog.id)}>
+              ♡
+            </button>
+          )}
+          <span className="blogLikes">{blog.likes} likes</span>
+        </div>
+      </div>
       <ToggleField buttonLabel="details">
         <BlogDetails
           blog={blog}

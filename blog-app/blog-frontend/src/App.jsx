@@ -38,6 +38,7 @@ const App = () => {
   useEffect(() => {
     const getBlogs = async () => {
       const response = await blogService.getAll();
+      response.sort((a, b) => b.likes - a.likes);
       setBlogs(response);
     };
     getBlogs();

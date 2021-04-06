@@ -1,7 +1,8 @@
 import React, { useState, useImperativeHandle } from "react";
+import PropTypes from "prop-types";
 
 const ToggleField = React.forwardRef(
-  ({ buttonLabel = "show", cancelLabel = "cancel", ...props }, ref) => {
+  ({ buttonLabel, cancelLabel = "cancel", ...props }, ref) => {
     const [visible, setVisible] = useState(false);
 
     const toggleVisibility = () => {
@@ -16,7 +17,7 @@ const ToggleField = React.forwardRef(
 
     if (!visible)
       return (
-        <div>
+        <div className="toggle-field">
           <button className="toggle-button" onClick={toggleVisibility}>
             {buttonLabel}
           </button>
@@ -33,4 +34,8 @@ const ToggleField = React.forwardRef(
     );
   }
 );
+
+ToggleField.propTypes = {
+  buttonLabel: PropTypes.string.isRequired,
+};
 export default ToggleField;

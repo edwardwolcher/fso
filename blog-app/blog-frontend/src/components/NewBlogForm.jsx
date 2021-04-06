@@ -11,6 +11,7 @@ const NewBlogForm = ({ blogs, setBlogs, sendMessage, newBlogFormRef }) => {
     try {
       const newBlog = await blogService.create({ title, url });
       const newBlogs = [...blogs, newBlog];
+      newBlogs.sort((a, b) => b.likes - a.likes);
       setBlogs(newBlogs);
       setTitle("");
       setUrl("");

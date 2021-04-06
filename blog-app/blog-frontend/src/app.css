@@ -117,17 +117,41 @@ header > div > p {
   margin-top: 1.4rem;
 }
 
+.blogHeader {
+  display: flex;
+  align-items: center;
+}
+
+.blogLikeField {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem;
+}
+
+.likeButton {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 50%;
+}
+.likeButton:hover {
+  filter: drop-shadow(0 0 2px red);
+}
+
 .blogitem {
   padding: 0.5rem;
   border: 2px solid #333;
   border-radius: 0.5rem;
   display: flex;
-  justify-content: space-between;
 }
 
 .blogitem > .toggle-field {
   display: flex;
   align-items: center;
+
+  margin-left: auto;
 }
 
 .blogitem .toggle-button {
