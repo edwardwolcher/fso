@@ -10,6 +10,7 @@ import {
 import blogRouter from "./controllers/blogs.js";
 import usersRouter from "./controllers/users.js";
 import loginRouter from "./controllers/login.js";
+import resetRouter from "./controllers/test-reset.js";
 
 const app = express();
 
@@ -27,6 +28,10 @@ app.use(getTokenFrom);
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/login", loginRouter);
+
+if (process.env.NODE_ENV === "test") {
+  app.use("/api/testing", resetRouter);
+}
 // Post-route middleware
 app.use(unknownEndpoint);
 app.use(errorHandler);

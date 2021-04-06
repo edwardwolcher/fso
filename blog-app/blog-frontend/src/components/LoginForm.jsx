@@ -43,16 +43,20 @@ const LoginForm = ({ user, setUser, sendMessage }) => {
             placeHolder="username"
             value={username}
             setter={setUsername}
+            id="input-loginUsername"
           ></Input>
           <Input
             placeHolder="password"
             type="password"
             value={password}
             setter={setPassword}
+            id="input-loginPassword"
           ></Input>
         </fieldset>
 
-        <button type="submit">login</button>
+        <button id="input-loginButton" type="submit">
+          login
+        </button>
         <button onClick={() => setShowLogin(false)}>cancel</button>
       </form>
     );
