@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import Blog from "./components/Blog";
+import React, { useState, useEffect, useRef } from "react";
+import Bloglist from "./components/Bloglist";
 import MessageBox from "./components/MessageBox";
 import NewBlogForm from "./components/NewBlogForm";
+import ToggleField from "./components/ToggleField";
 import blogService from "./services/blogs";
 import LoginForm from "./components/LoginForm";
 import "./app.css";
@@ -51,19 +52,30 @@ const App = () => {
     }
   }, []);
 
-  const deleteBlog = async (id) => {
-    try {
-      await blogService.remove(id);
-      const indexToRemove = blogs.findIndex((blog) => blog.id === id);
-      const deletedBlogTitle = blogs[indexToRemove].title;
-      const newBlogs = [...blogs];
-      newBlogs.splice(indexToRemove, 1);
-      setBlogs(newBlogs);
-      sendMessage(`${deletedBlogTitle} removed`);
-    } catch (error) {
-      sendMessage("error deleting blog", "error");
-    }
+  const newBlogFormRef = useRef();
+
+  const newBlogForm = () => {
+    if (!canPost(user)) return null;
+    return (
+      <ToggleField buttonLabel="New Blog" ref={newBlogFormRef}>
+        <NewBlogForm
+          blogs={blogs}
+          setBlogs={setBlogs}
+          sendMessage={sendMessage}
+          newBlogFormRef={newBlogFormRef}
+        />
+      </ToggleField>
+    );
   };
+
+  const bloglist = () => (
+    <Bloglist
+      blogs={blogs}
+      setBlogs={setBlogs}
+      sendMessage={sendMessage}
+      user={user}
+    />
+  );
 
   return (
     <div className="app">
@@ -73,23 +85,8 @@ const App = () => {
       </header>
       {message && <MessageBox message={message} />}
       <div className="wrapper">
-        {canPost(user) && (
-          <NewBlogForm
-            blogs={blogs}
-            setBlogs={setBlogs}
-            sendMessage={sendMessage}
-          />
-        )}
-        <div className="bloglist">
-          {blogs.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              deleteBlog={deleteBlog}
-              user={user}
-            />
-          ))}
-        </div>
+        {newBlogForm()}
+        {bloglist()}
       </div>
     </div>
   );

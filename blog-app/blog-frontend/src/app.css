@@ -52,12 +52,13 @@ header {
 header > form,
 header > div {
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
 }
 
-header > form > button,
-header > div > button {
-  justify-self: right;
+header > form > fieldset,
+header > div > p {
+  grid-column: 1/3;
 }
 
 .loginField {
@@ -67,7 +68,6 @@ header > div > button {
 
 .loginField > input {
   text-align: right;
-  width: 18ch;
 }
 
 .message {
@@ -106,4 +106,30 @@ header > div > button {
   display: grid;
   gap: 0.25rem;
   grid-template-columns: auto 1fr;
+}
+
+.bloglist {
+  display: flex;
+  flex-direction: column;
+}
+
+.bloglist > * + * {
+  margin-top: 1.4rem;
+}
+
+.blogitem {
+  padding: 0.5rem;
+  border: 2px solid #333;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.blogitem > .toggle-field {
+  display: flex;
+  align-items: center;
+}
+
+.blogitem .toggle-button {
+  margin-left: 1rem;
 }

@@ -6,6 +6,7 @@ import Input from "./Input";
 const LoginForm = ({ user, setUser, sendMessage }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showLogin, setShowLogin] = useState(false);
 
   const login = async (event) => {
     event.preventDefault();
@@ -17,6 +18,7 @@ const LoginForm = ({ user, setUser, sendMessage }) => {
       setUsername("");
       setPassword("");
       sendMessage(`logged in as ${newUser.username}`);
+      setShowLogin(false);
     } catch (error) {
       const errorMessage = error.response.data.error
         ? error.response.data.error
@@ -29,6 +31,7 @@ const LoginForm = ({ user, setUser, sendMessage }) => {
     window.localStorage.removeItem("userInfo");
     blogService.setToken(null);
     setUser(null);
+    setShowLogin(false);
     sendMessage(`${user.username} logged out`);
   };
 
@@ -50,9 +53,11 @@ const LoginForm = ({ user, setUser, sendMessage }) => {
         </fieldset>
 
         <button type="submit">login</button>
+        <button onClick={() => setShowLogin(false)}>cancel</button>
       </form>
     );
   };
+
   const loggedInForm = () => (
     <div>
       <p>{user.username} logged in</p>
@@ -61,6 +66,10 @@ const LoginForm = ({ user, setUser, sendMessage }) => {
       </button>
     </div>
   );
+
+  if (user === null && !showLogin) {
+    return <button onClick={() => setShowLogin(true)}>Sign in</button>;
+  }
 
   return user === null ? loginForm() : loggedInForm();
 };

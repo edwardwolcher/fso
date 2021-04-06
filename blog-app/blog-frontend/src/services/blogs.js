@@ -24,9 +24,19 @@ const remove = async (id) => {
   const config = {
     headers: { Authorization: token },
   };
-  await axios.delete(`${baseUrl}/${id}`, config);
+  const endpoint = `${baseUrl}/${id}`;
+  await axios.delete(endpoint, config);
 };
 
-const blogService = { setToken, getAll, create, remove };
+const update = async (id, updateObject) => {
+  const endpoint = `${baseUrl}/${id}`;
+  const config = {
+    headers: { Authorization: token },
+  };
+  const response = await axios.put(endpoint, updateObject, config);
+  return response.data;
+};
+
+const blogService = { setToken, getAll, create, remove, update };
 
 export default blogService;

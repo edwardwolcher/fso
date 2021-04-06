@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Input from "./Input";
 import blogService from "../services/blogs";
 
-const NewBlogForm = ({ blogs, setBlogs, sendMessage }) => {
+const NewBlogForm = ({ blogs, setBlogs, sendMessage, newBlogFormRef }) => {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
 
@@ -10,16 +10,14 @@ const NewBlogForm = ({ blogs, setBlogs, sendMessage }) => {
     event.preventDefault();
     try {
       const newBlog = await blogService.create({ title, url });
-      console.log(newBlog);
       const newBlogs = [...blogs, newBlog];
       setBlogs(newBlogs);
       setTitle("");
       setUrl("");
       sendMessage(`${newBlog.title} posted`);
+      newBlogFormRef.current.toggleVisibility();
     } catch (error) {
-      const errorMessage = error.response.data.error
-        ? error.response.data.error
-        : "could not create blog";
+      const errorMessage = "could not create blog";
       sendMessage(errorMessage, "error");
     }
   };

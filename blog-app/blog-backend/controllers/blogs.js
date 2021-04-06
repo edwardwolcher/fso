@@ -71,11 +71,15 @@ blogRouter.delete("/:id", getUser, async (req, res) => {
 });
 
 // Update
-blogRouter.put("/:id", async (req, res) => {
+blogRouter.put("/:id", getUser, async (req, res) => {
   const id = req.params.id;
   const updates = req.body;
+  updates.author = updates.author.id; // TODO - explore a better way than this?
   const updatedBlog = await Blog.findByIdAndUpdate(id, updates, {
     new: true,
+  }).populate("author", {
+    username: 1,
+    name: 1,
   });
   if (updatedBlog) {
     res.json(updatedBlog);
