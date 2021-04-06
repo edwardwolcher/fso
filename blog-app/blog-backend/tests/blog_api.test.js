@@ -189,22 +189,42 @@ describe("Delete by ID", () => {
 describe("Update", () => {
   test("a post can be updated", async () => {
     const blogs = await getBlogs();
-    const oneBlog = blogs[0];
+    const blogToUpdate = blogs[0];
+    const blogUpdate = { ...blogToUpdate, likes: blogToUpdate.likes + 1 };
+    const token = getToken(initialAuthors[0]);
+
     await api
-      .put(`/api/blogs/${oneBlog.id}`)
-      .send({ likes: oneBlog.likes + 1 })
+      .put(`/api/blogs/${blogUpdate.id}`)
+      .set({ authorization: `Bearer ${token}` })
+      .send(blogUpdate)
       .expect(200);
-    const updatedBlog = await Blog.findById(oneBlog.id);
-    expect(updatedBlog.likes).toBe(oneBlog.likes + 1);
+    const updatedBlog = await Blog.findById(blogUpdate.id);
+    expect(updatedBlog.likes).toBe(blogToUpdate.likes + 1);
   });
 
   test("putting to a bad id gives a 404", async () => {
+    const blogs = await getBlogs();
+    const blogToUpdate = blogs[0];
+    const blogUpdate = { ...blogToUpdate, likes: blogToUpdate.likes + 1 };
+    const token = getToken(initialAuthors[0]);
     const badID = await nonExistingId();
-    await api.put(`/api/blogs/${badID}`).send({ likes: 666 }).expect(404);
+    await api
+      .put(`/api/blogs/${badID}`)
+      .set({ authorization: `Bearer ${token}` })
+      .send(blogUpdate)
+      .expect(404);
   });
 
   test("malformed id gives a 400", async () => {
-    await api.put(`/api/blogs/bar`).send({ likes: 666 }).expect(400);
+    const blogs = await getBlogs();
+    const blogToUpdate = blogs[0];
+    const blogUpdate = { ...blogToUpdate, likes: blogToUpdate.likes + 1 };
+    const token = getToken(initialAuthors[0]);
+    await api
+      .put(`/api/blogs/bar`)
+      .set({ authorization: `Bearer ${token}` })
+      .send(blogUpdate)
+      .expect(400);
   });
 });
 
