@@ -1,6 +1,7 @@
 import React from "react";
 import NewAnecdoteForm from "./components/NewAnecdoteForm";
 import AnecdoteList from "./components/AnecdoteList";
+import Notification from "./components/Notification";
 
 const App = () => {
   return (
@@ -9,6 +10,7 @@ const App = () => {
       <AnecdoteList />
       <h2>create new</h2>
       <NewAnecdoteForm />
+      <Notification />
     </div>
   );
 };
