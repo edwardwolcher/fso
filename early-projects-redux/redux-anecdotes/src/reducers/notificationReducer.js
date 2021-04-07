@@ -1,12 +1,13 @@
-export const setNotification = (notification, timeout = 5) => {
+export const setNotification = (notification, duration = 5) => {
   return (dispatch) => {
+    console.log("here");
+    const timeout = setTimeout(() => {
+      dispatch(clearNotification());
+    }, duration * 1000);
     dispatch({
       type: "SET_NOTIFICATION",
-      notification: notification,
+      data: { notification: notification, timeout: timeout },
     });
-    setTimeout(() => {
-      dispatch(clearNotification());
-    }, timeout * 1000);
   };
 };
 
@@ -16,12 +17,15 @@ export const clearNotification = () => {
   };
 };
 
-const notificationReducer = (state = "", action) => {
+const clear = { timeout: null, notification: "" };
+
+const notificationReducer = (state = clear, action) => {
   switch (action.type) {
     case "SET_NOTIFICATION":
-      return action.notification;
+      if (state.timeout) clearTimeout(state.timeout);
+      return action.data;
     case "CLEAR_NOTIFICATION":
-      return "";
+      return clear;
     default:
       return state;
   }
