@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
 import NewAnecdoteForm from "./components/NewAnecdoteForm";
 import AnecdoteList from "./components/AnecdoteList";
 
