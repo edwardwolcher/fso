@@ -52,7 +52,9 @@ const Blog = () => {
         <div>
           <p>Add comment: </p>
           <Input value={comment} setter={setComment} />
-          <button onClick={() => sendComment()}>Add</button>
+          <button className="bg-primary" onClick={() => sendComment()}>
+            Add
+          </button>
         </div>
         {blog.comments.map((comment, index) => (
           <div key={index}>{comment}</div>

@@ -20,18 +20,16 @@ const BlogListing = ({ blog, user }) => {
 
   return (
     <div className="blogitem">
-      <div className="blogHeader">
-        <h3>
-          <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-        </h3>
-        <div className="blogLikeField">
-          {user && (
-            <button className="likeButton" onClick={() => likeBlog(blog)}>
-              ♡
-            </button>
-          )}
-          <span className="blogLikes">{blog.likes} likes</span>
-        </div>
+      <h3>
+        <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+      </h3>
+      <div className="blogLikeField">
+        {user && (
+          <button className="likeButton" onClick={() => likeBlog(blog)}>
+            ♡
+          </button>
+        )}
+        <span className="blogLikes">{blog.likes} likes</span>
       </div>
     </div>
   );
@@ -47,7 +45,8 @@ const Bloglist = () => {
 
   return (
     <div className="bloglist">
-      <h2>Blogs</h2>
+      <h1>Blogs</h1>
+
       {blogs.map((blog) => (
         <BlogListing key={blog.id} blog={blog} user={user} />
       ))}

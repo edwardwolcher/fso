@@ -27,42 +27,48 @@ const LoginForm = () => {
 
   const loginForm = () => {
     return (
-      <form onSubmit={login}>
-        <fieldset className="loginField">
-          <Input
-            placeHolder="username"
-            value={username}
-            setter={setUsername}
-            id="input-loginUsername"
-          ></Input>
-          <Input
-            placeHolder="password"
-            type="password"
-            value={password}
-            setter={setPassword}
-            id="input-loginPassword"
-          ></Input>
-        </fieldset>
+      <form data-state="login-open" className="login-form" onSubmit={login}>
+        <Input
+          placeHolder="username"
+          value={username}
+          setter={setUsername}
+          id="input-loginUsername"
+        ></Input>
+        <Input
+          placeHolder="password"
+          type="password"
+          value={password}
+          setter={setPassword}
+          id="input-loginPassword"
+        ></Input>
 
-        <button id="input-loginButton" type="submit">
+        <button className="bg-secondary" id="input-loginButton" type="submit">
           login
         </button>
-        <button onClick={() => setShowLogin(false)}>cancel</button>
+        <button className="bg-tertiary" onClick={() => setShowLogin(false)}>
+          cancel
+        </button>
       </form>
     );
   };
 
   const loggedInForm = () => (
-    <div>
-      <p>{user.username} logged in</p>
-      <button type="button" onClick={() => logout()}>
+    <div data-state="logged-in" className="login-form">
+      <div className="login-info">{user.username} logged in</div>
+      <button className="bg-tertiary" type="button" onClick={() => logout()}>
         logout
       </button>
     </div>
   );
 
   if (user === null && !showLogin) {
-    return <button onClick={() => setShowLogin(true)}>Sign in</button>;
+    return (
+      <div data-state="login-closed" className="login-form">
+        <button className="bg-secondary" onClick={() => setShowLogin(true)}>
+          Sign in
+        </button>
+      </div>
+    );
   }
 
   return user === null ? loginForm() : loggedInForm();
