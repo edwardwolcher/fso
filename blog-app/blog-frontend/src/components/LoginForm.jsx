@@ -1,38 +1,28 @@
 import React, { useState } from "react";
-import blogService from "../services/blogs";
-import loginService from "../services/login";
 import Input from "./Input";
+import { loginUser, logoutUser } from "../reducers/loginReducer";
+import { useDispatch, useSelector } from "react-redux";
 
-const LoginForm = ({ user, setUser, sendMessage }) => {
+const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showLogin, setShowLogin] = useState(false);
 
-  const login = async (event) => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.login);
+
+  const login = (event) => {
     event.preventDefault();
-    try {
-      const newUser = await loginService.login(username, password);
-      window.localStorage.setItem("userInfo", JSON.stringify(newUser));
-      blogService.setToken(newUser.token);
-      setUser(newUser);
-      setUsername("");
-      setPassword("");
-      sendMessage(`logged in as ${newUser.username}`);
-      setShowLogin(false);
-    } catch (error) {
-      const errorMessage = error.response.data.error
-        ? error.response.data.error
-        : "invalid username or password";
-      sendMessage(errorMessage, "error");
-    }
+    dispatch(loginUser(username, password));
+    setUsername("");
+    setPassword("");
   };
 
   const logout = async () => {
-    window.localStorage.removeItem("userInfo");
-    blogService.setToken(null);
-    setUser(null);
+    dispatch(logoutUser(user));
     setShowLogin(false);
-    sendMessage(`${user.username} logged out`);
+    setUsername("");
+    setPassword("");
   };
 
   const loginForm = () => {

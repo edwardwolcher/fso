@@ -74,6 +74,7 @@ blogRouter.delete("/:id", getUser, async (req, res) => {
 blogRouter.put("/:id", getUser, async (req, res) => {
   const id = req.params.id;
   const updates = req.body;
+  console.log(updates);
   updates.author = updates.author.id; // TODO - explore a better way than this?
   const updatedBlog = await Blog.findByIdAndUpdate(id, updates, {
     new: true,
@@ -81,6 +82,22 @@ blogRouter.put("/:id", getUser, async (req, res) => {
     username: 1,
     name: 1,
   });
+  if (updatedBlog) {
+    res.json(updatedBlog);
+  } else {
+    res.status(404).end();
+  }
+});
+
+// Comment
+blogRouter.post("/:id/comments", async (req, res) => {
+  const id = req.params.id;
+  const comment = req.body.comment;
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    id,
+    { $push: { comments: comment } },
+    { new: true }
+  );
   if (updatedBlog) {
     res.json(updatedBlog);
   } else {

@@ -1,27 +1,29 @@
 import React, { useState } from "react";
 import Input from "./Input";
-import blogService from "../services/blogs";
+import { useDispatch, useSelector } from "react-redux";
+import { addBlog } from "../reducers/blogsReducer";
+import ToggleField from "./ToggleField";
+import { useHistory } from "react-router-dom";
 
-const NewBlogForm = ({ blogs, setBlogs, sendMessage, newBlogFormRef }) => {
+const NewBlogForm = () => {
+  const user = useSelector((state) => state.login);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  if (!user || !user.canPost()) {
+    return <></>;
+  }
 
   const submitBlog = async (event) => {
     event.preventDefault();
-    try {
-      const newBlog = await blogService.create({ title, url });
-      const newBlogs = [...blogs, newBlog];
-      newBlogs.sort((a, b) => b.likes - a.likes);
-      setBlogs(newBlogs);
-      setTitle("");
-      setUrl("");
-      sendMessage(`${newBlog.title} posted`);
-      newBlogFormRef.current.toggleVisibility();
-    } catch (error) {
-      const errorMessage = "could not create blog";
-      sendMessage(errorMessage, "error");
-    }
+    dispatch(addBlog(title, url));
+    setTitle("");
+    setUrl("");
+    history.push("/");
   };
+
   const titleInputID = "input-newBlogTitle";
   const urlInputID = "input-newBlogUrl";
   const titleInputLabel = "Title:";
